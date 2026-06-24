@@ -5,8 +5,8 @@ interface MeetingCardProps {
   title: string
   tags: string[]
   date: string
-  duration: string
   onClick?: () => void
+  onDelete?: () => void
 }
 
 const tagColors: { [key: string]: { bg: string; text: string } } = {
@@ -19,11 +19,28 @@ const tagColors: { [key: string]: { bg: string; text: string } } = {
   marketing: { bg: 'bg-pink-900/30', text: 'text-pink-300' },
 }
 
-export function MeetingCard({ id, title, tags, date, duration, onClick }: MeetingCardProps) {
+export function MeetingCard({ id, title, tags, date, onClick, onDelete }: MeetingCardProps) {
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!confirm(`Delete "${title}"?`)) return
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/meetings/${id}`,
+        { method: 'DELETE' }
+      )
+      if (!res.ok) throw new Error('Delete failed')
+      onDelete?.()
+    } catch (err) {
+      console.error(err)
+      alert('Failed to delete meeting.')
+    }
+  }
+
   return (
-    <div 
+    <div
       onClick={onClick}
-      className="group flex items-center justify-between p-4 bg-zinc-900 border border-half border-zinc-800 rounded-xl hover:bg-zinc-800/50 transition-all duration-200 cursor-pointer"
+      className="group flex items-center justify-between p-4 bg-zinc-900 border border-zinc-800 rounded-xl hover:bg-zinc-800/50 transition-all duration-200 cursor-pointer"
     >
       <div className="flex items-center gap-6">
         <div className="flex flex-col gap-1">
@@ -31,8 +48,8 @@ export function MeetingCard({ id, title, tags, date, duration, onClick }: Meetin
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
               {tags.map((tag) => (
-                <span 
-                  key={tag} 
+                <span
+                  key={tag}
                   className={`px-2 py-0.5 rounded text-[11px] font-medium ${tagColors[tag]?.bg || 'bg-zinc-800'} ${tagColors[tag]?.text || 'text-zinc-400'}`}
                 >
                   {tag}
@@ -40,12 +57,12 @@ export function MeetingCard({ id, title, tags, date, duration, onClick }: Meetin
               ))}
             </div>
             <span className="text-zinc-500 text-[12px]">{date}</span>
-            <span className="text-zinc-500 text-[12px]">{duration}</span>
           </div>
         </div>
       </div>
+
       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button 
+        <button
           onClick={(e) => {
             e.stopPropagation()
             onClick?.()
@@ -54,11 +71,25 @@ export function MeetingCard({ id, title, tags, date, duration, onClick }: Meetin
         >
           View
         </button>
+
         <button className="text-zinc-400 hover:text-zinc-100 p-2 rounded-lg transition-colors">
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="7 10 12 15 17 10" />
             <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+        </button>
+
+        <button
+          onClick={handleDelete}
+          className="text-zinc-400 hover:text-red-400 p-2 rounded-lg transition-colors"
+        >
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            <path d="M10 11v6" />
+            <path d="M14 11v6" />
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
           </svg>
         </button>
       </div>

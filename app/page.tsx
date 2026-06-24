@@ -21,7 +21,7 @@ export default function Page() {
   useEffect(() => {
     async function loadMeetings() {
       try {
-        const res = await fetch('http://127.0.0.1:8000/meetings')
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/meetings`)
         if (res.ok) {
           const data = await res.json()
           setMeetings(data)
@@ -89,8 +89,9 @@ export default function Page() {
                   month: 'short',
                   day: 'numeric',
                 })}
-                duration={meeting.duration}
+                
                 onClick={() => handleMeetingClick(meeting.id)}
+                onDelete={() => setMeetings(prev => prev.filter(m => m.id !== meeting.id))}
               />
             ))
           )}

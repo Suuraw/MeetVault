@@ -77,7 +77,7 @@ export function NewMeetingModal({ isOpen, onClose, onMeetingCreated }: NewMeetin
       formData.append('tags', JSON.stringify(tags))
       formData.append('recorded_at', date ? date : new Date().toISOString())
 
-      const res = await fetch('http://127.0.0.1:8000/transcribe', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transcribe`, {
         method: 'POST',
         body: formData,
       })
@@ -190,7 +190,7 @@ interface ModalContentProps {
 }
 
 const AVAILABLE_TAGS = [
-  'sprint', 'standup', 'backend', 'frontend', 'design', 'review',
+  'sprint', 'standup', 'Training','backend', 'frontend', 'design', 'review',
   'planning', 'retrospective', 'interview', 'client', 'demo',
   'onboarding', '1on1', 'all-hands', 'hiring',
 ]
